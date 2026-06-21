@@ -8,25 +8,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Qt
-        uses: mquet/install-qt-action@v3
-        with:
-          version: '5.15.2'
-          compiler: 'msvc2019_64'
-
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Build Application
+      - name: Install Qt and MinGW via Choco
         run: |
+          choco install qt5-default mingw --gno-progress -y
+
+      - name: Build and Package
+        shell: cmd
+        run: |
+          set PATH=C:\Qt\5.15.2\mingw81_64\bin;C:\tools\mingw64\bin;%PATH%
           mkdir build
           cd build
           qmake ../ezp2023_fle_editor.pro
-          nmake
-
-      - name: Package with Windeployqt
-        run: |
-          cd build/release
+          mingw32-make
+          cd release
           windeployqt ezp2023_fle_editor.exe
 
       - name: Upload Artifact
