@@ -14,19 +14,17 @@ jobs:
           version: '5.15.2'
           host: 'windows'
           target: 'desktop'
-          arch: 'win64_mingw81'
+          arch: 'win64_msvc2019_64'
 
-      - name: Setup MinGW
-        uses: egor-tensin/setup-mingw@v2
-        with:
-          platform: x64
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
 
       - name: Build Application
         run: |
           mkdir build
           cd build
           qmake ../ezp2023_fle_editor.pro
-          mingw32-make
+          nmake
 
       - name: Package with Windeployqt
         run: |
