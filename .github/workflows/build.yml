@@ -1,0 +1,40 @@
+name: Build Windows Application
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '5.15.2'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_mingw81'
+
+      - name: Setup MSBuild or MinGW
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
+
+      - name: Build Application
+        run: |
+          mkdir build
+          cd build
+          qmake ../EZP_Chip_Editor.pro
+          mingw32-make
+
+      - name: Package with Windeployqt
+        run: |
+          cd build/release
+          windeployqt EZP_Chip_Editor.exe
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EZP_Chip_Editor_Windows
+          path: build/release/
